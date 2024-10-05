@@ -5,6 +5,7 @@ from web3 import Web3
 import tronpy
 import random
 import json
+import bson
 
 app = Flask(__name__)
 api = Api(app)
@@ -60,50 +61,37 @@ def get_listing(uid):
         return jsonify({"error": str(e)}), 500
     
 
-# Route for creating a new listing (PUT request)
 @app.route('/listing', methods=['PUT'])
 def create_listing():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
+    # Generate a random int64 UID
+    uid = random.randint(0, 2**63 - 1)
+
+    new_listing = {
+        "uid": uid,
+        "img_url": data.get("img_url"),
+        "title": data.get("title"),
+        "desc": data.get("desc"),
+        "seller_address": data.get("seller_address"),
+        "price": data.get("price"),
+        "shipping": data.get("shipping"),
+        "coordinates": data.get("coordinates"),
+        "is_bought": data.get("is_bought", False),  # Default to False if not provided
+    }
+
+    # Insert the new listing into the MongoDB database
     try:
-        # Get the JSON payload from the request
-        data = request.json
-
-        # Generate a random int64 UID
-        uid = random.randint(1, 2**63 - 1)
-
-        # Define the fields for the new listing
-        new_listing = {
-            "uid": uid,
-            "img_url": data.get("img_url"),
-            "title": data.get("title"),
-            "desc": data.get("desc"),
-            "seller_address": data.get("seller_address"),
-            "price": data.get("price"),
-            "shipping": data.get("shipping"),
-            "coordinates": data.get("coordinates"),
-            "is_bought": data.get("is_bought", False),  # Default to False if not provided
-        }
-
-        # Insert the new listing into MongoDB
         result = db.listings.insert_one(new_listing)
-
-        # Return the newly created listing
-        response = {
-            "_id": str(result.inserted_id),
-            "uid": new_listing["uid"],
-            "img_url": new_listing["img_url"] or None,
-            "title": new_listing["title"],
-            "desc": new_listing["desc"],
-            "seller_address": new_listing["seller_address"],
-            "price": new_listing["price"],
-            "shipping": new_listing["shipping"],
-            "coordinates": new_listing["coordinates"],
-            "is_bought": new_listing["is_bought"],
-        }
-
-        return jsonify(response), 200
-
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({'error': str(e)}), 500
+
+    return jsonify({
+        'message': 'Listing created successfully',
+        'listing_id': str(uid)
+    }), 201
 
 @app.route('/listings/uid', methods=['GET'])
 def get_uids():
