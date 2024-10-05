@@ -9,6 +9,8 @@ import json
 from flask_cors import CORS
 
 
+
+
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 api = Api(app)
@@ -16,12 +18,36 @@ api = Api(app)
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
+from tronpy.keys import PrivateKey
+from tronpy import Tron
+
+tronClient = Tron(network='nile')
+address = 'TJGy4Dz4bPDBtNCoyvwfFXBYxbEa82mpL2'
+
+contract_abi = {"entrys":[{"name":"NotEnoughMoney","type":"Error"},{"name":"TransactionFailed","type":"Error"},{"inputs":[{"name":"index","type":"uint256"},{"name":"amount","type":"uint256"}],"name":"buy","stateMutability":"Nonpayable","type":"Function"},{"outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"address"}],"inputs":[{"name":"index","type":"uint256"}],"name":"getListing","stateMutability":"View","type":"Function"},{"outputs":[{"name":"price","type":"uint256"},{"name":"bought","type":"bool"},{"name":"uid","type":"uint256"},{"name":"seller","type":"address"},{"name":"token","type":"address"}],"inputs":[{"type":"uint256"}],"name":"listings","stateMutability":"View","type":"Function"},{"inputs":[{"name":"_price","type":"uint256"},{"name":"_uid","type":"uint256"},{"name":"_seller","type":"address"},{"name":"_token","type":"address"}],"name":"makeListing","stateMutability":"Nonpayable","type":"Function"}]}
+contract = tronClient.get_contract(address)
+
+print(dir(contract.functions))
+
 uri = "mongodb+srv://proxydox3:yK1TlkfVU6u3HKw3@cluster0.n6g4h.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
+
 
 # Create a new client and connect to the server
 client = MongoClient(uri)
 
 db = client.swapsquad
+
+
+listings = db.listings.find()
+for listing in listings:
+    uid = listing.get('uid')
+    price = listing.get('price')
+    seller_address = listing.get('seller_address')
+    print("ADDING",uid,price,seller_address)
+    
+    
+    
 # Send a ping to confirm a successful connection
 try:
     client.admin.command('ping')
@@ -63,6 +89,21 @@ def get_listing(uid):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+@app.route('/buy', methods=['POST'])
+def purchase():
+    try:
+        data = request.json
+        listing = db.listings.find_one({"uid": uid})
+        
+        buyorder = {
+            "uid" : data["uid"],
+            "seller_address": listing.get("seller_address"),
+            "price": listing.get("price")
+        }
+        contract.functions.buy(buyorder['price'], buyorder['uid'])
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Route for creating a new listing (PUT request)
 @app.route('/listing', methods=['PUT'])
@@ -103,7 +144,7 @@ def create_listing():
             "coordinates": new_listing["coordinates"],
             "is_bought": new_listing["is_bought"],
         }
-
+        contract.functions.makeListing(new_listing['price'], new_listing['uid'], new_listing['seller_address'])
         return jsonify(response), 200
 
     except Exception as e:
