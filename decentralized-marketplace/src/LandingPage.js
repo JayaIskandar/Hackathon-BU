@@ -11,10 +11,6 @@ function LandingPage({ navigateToMarketplace }) {
       <header className="bg-dark text-white p-3">
         <div className="container d-flex justify-content-between">
           <h1 className="h3">Swap Squad</h1>
-          <nav>
-            <a href="#features" className="text-white me-3">Features</a>
-            <a href="#about" className="text-white">About</a>
-          </nav>
         </div>
       </header>
 
@@ -75,10 +71,6 @@ function LandingPage({ navigateToMarketplace }) {
       <footer className="bg-dark text-white py-3">
         <div className="container text-center">
           <p>© 2024 Swap Squad. All Rights Reserved.</p>
-          <p>
-            <a href="#" className="text-white me-2">Privacy Policy</a>
-            <a href="#" className="text-white">Terms of Service</a>
-          </p>
         </div>
       </footer>
     </div>
