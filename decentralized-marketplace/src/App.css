@@ -1,7 +1,38 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%; /* Ensure full height */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  font-family: 'Poppins', Arial, sans-serif; /* Use Poppins font */
+  line-height: 1.6; /* Improve line spacing */
+  color: black; /* Change font color to black */
+}
+
+h2.display-4 {
+  font-weight: 700; /* Poppins bold equivalent */
+}
+
+p.lead {
+  font-weight: 700; /* Force bold for lead paragraph */
+}
+
+.btn-lg {
+  font-weight: bold; /* Bold for the button */
+}
+
+
 .App {
   text-align: center;
-  padding: 20px;
+  width: 100%; /* Full width */
+  min-height: 100vh; /* Full height of the viewport */
+  background-color: #f8f9fa; /* Optional background color for contrast */
 }
+
+.card {
+  border: 1px solid #ccc; /* Optional: border style */
+  border-radius: 15px; /* Adjust the value for more or less roundness */
+}
+
 
 .product-list {
   display: flex;
@@ -30,4 +61,42 @@
 
 .product-card p {
   margin: 5px 0;
+}
+
+
+.wishlist-card {
+  border: 1px solid #ddd; /* Card border */
+  border-radius: 5px; /* Rounded corners */
+  padding: 10px; /* Padding inside the card */
+  background-color: #f9f9f9; /* Light background color */
+}
+
+.wishlist-card-img {
+  width: 150px; /* Width of the image */
+  height: auto; /* Maintain aspect ratio */
+  margin-right: 15px; /* Space between image and text */
+}
+
+.wishlist-card-body {
+  flex-grow: 1; /* Allow text to take remaining space */
+}
+
+.wishlist-card-title {
+  font-size: 1.25rem; /* Title font size */
+  margin: 0; /* Remove default margin */
+}
+
+.wishlist-card-text {
+  margin: 5px 0; /* Vertical margin for description */
+}
+
+.wishlist-card-price {
+  font-weight: bold; /* Bold price text */
+}
+
+.card-img-top {
+  width: 100%; /* Ensure the image fills the width */
+  height: auto; /* Maintain aspect ratio */
+  object-fit: cover; /* Cover the area, cropping if necessary */
+  aspect-ratio: 1 / 1; /* Set aspect ratio to 1:1 */
 }
