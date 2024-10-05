@@ -26,11 +26,11 @@ except Exception as e:
     print("ERROR CONNECTING TO DB")
     print(e)
 
-@app.route('/listing/<int:uid>', methods=['GET'])
+@app.route('/listing/<int:uid>', methods=['GET', 'POST'])
 def get_listing(uid):
     try:
         # Fetch the listing from MongoDB using the uid
-        listing = db.find_one({"uid": uid})
+        listing = db.listings.find_one({"uid": uid})
 
         if listing is None:
             return jsonify({"error": "Listing not found"}), 404
@@ -84,7 +84,7 @@ def create_listing():
         }
 
         # Insert the new listing into MongoDB
-        result = db.insert_one(new_listing)
+        result = db.listings.insert_one(new_listing)
 
         # Return the newly created listing
         response = {
@@ -109,7 +109,7 @@ def create_listing():
 def get_uids():
     try:
         # Fetch up to 30 listings from MongoDB
-        listings = db.find({}, {"uid": 1}).limit(30)
+        listings = db.listings.find({}, {"uid": 1}).limit(30)
 
         # Extract UIDs from the documents
         uids = [listing["uid"] for listing in listings]
@@ -118,9 +118,6 @@ def get_uids():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
